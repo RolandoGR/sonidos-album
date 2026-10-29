@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Sonidos del álbum</title>
+<meta name="description" content="Toca una estampa del álbum de animales y escucha cómo suena.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Andika:wght@400;700&display=swap">
+<style>
+/* Para el celular de un niño: una sección por bioma (el QR del álbum lleva a la suya), estampas grandes y
+   un botón que suena ahí mismo. Sin enlaces que salgan de la página. */
+:root {
+  --bg: #F5EFE3; --surface: #FFFDF8; --ink: #2B241D; --muted: #6E6457; --line: #E2D7C4;
+  --font-display: "Baloo 2", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --font-body: "Andika", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root { --bg: #191612; --surface: #24201A; --ink: #F2EBDF; --muted: #B9AD9C; --line: #3A332A; color-scheme: dark; } }
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.05rem/1.55 var(--font-body);
+  padding: 0 max(16px, env(safe-area-inset-right)) 4rem max(16px, env(safe-area-inset-left)); -webkit-tap-highlight-color: transparent; }
+.wrap { max-width: 1000px; margin: 0 auto; display: grid; gap: 2.5rem; }
+header { padding-top: max(1.5rem, env(safe-area-inset-top)); display: grid; gap: .7rem; }
+h1, h2 { font-family: var(--font-display); font-weight: 800; line-height: 1.1; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 8vw, 3rem); }
+h2 { font-size: clamp(1.5rem, 6vw, 2rem); color: #fff; background: var(--c); padding: .3rem 1rem; border-radius: 14px; justify-self: start; }
+p { margin: 0; max-width: 62ch; }
+.lede { color: var(--muted); font-size: 1.1rem; }
+nav { display: flex; flex-wrap: wrap; gap: .5rem; }
+nav a { text-decoration: none; color: #fff; background: var(--c); font-weight: 700; padding: .4rem .9rem; border-radius: 999px; }
+section { display: grid; gap: 1rem; scroll-margin-top: 1rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; }
+.card { background: var(--surface); border: 2px solid var(--line); border-radius: 20px; padding: .7rem; display: grid; gap: .55rem;
+  align-content: start; transition: border-color .2s, transform .2s; }
+.card.on { border-color: var(--c); transform: scale(1.02); }
+.card img { width: 100%; height: auto; aspect-ratio: 299 / 389; display: block; filter: drop-shadow(0 4px 8px rgb(0 0 0 / .18)); }
+.name { font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; line-height: 1.15; }
+.num { color: var(--muted); font-size: .85rem; }
+.play { appearance: none; border: 0; width: 100%; min-height: 52px; display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  color: #fff; background: var(--c); border-radius: 999px; padding: .5rem .8rem; font: 700 1.1rem var(--font-body); cursor: pointer;
+  box-shadow: 0 3px 0 rgb(0 0 0 / .2); touch-action: manipulation; }
+.play:active { transform: translateY(2px); box-shadow: 0 1px 0 rgb(0 0 0 / .2); }
+.play:focus-visible, nav a:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.play svg { width: 20px; height: 20px; fill: currentColor; flex: none; }
+.bars { display: none; gap: 3px; align-items: end; height: 18px; }
+.bars i { width: 4px; background: #fff; border-radius: 2px; animation: b .8s ease-in-out infinite; }
+.bars i:nth-child(2) { animation-delay: -.3s; } .bars i:nth-child(3) { animation-delay: -.55s; }
+@keyframes b { 0%, 100% { height: 5px; } 50% { height: 18px; } }
+.on .bars { display: inline-flex; } .on .icon { display: none; }
+.quiet { font-size: .95rem; color: var(--ink); background: var(--bg); border-radius: 14px; padding: .55rem .65rem; border: 2px dashed var(--line); }
+.quiet::before { content: "🤫 "; }
+details { border-top: 1px solid var(--line); padding-top: 1rem; color: var(--muted); font-size: .9rem; }
+summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+details p { margin-top: .6rem; }
+details ol { padding-left: 1.2rem; display: grid; gap: .35rem; }
+.src { overflow-wrap: anywhere; opacity: .8; }
+@media (prefers-reduced-motion: reduce) { .card, .bars i { transition: none; animation: none; } .bars i { height: 12px; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <h1>Sonidos del álbum</h1>
+    <p class="lede">Busca a tu animal y toca el botón para oír cómo suena.</p>
+    <nav id="nav" aria-label="Biomas"></nav>
+  </header>
+  <div id="list" class="wrap"></div>
+  <details>
+    <summary>Para adultos</summary>
+    <p>Las 88 grabaciones son reales y de licencia libre (dominio público, CC0 o CC BY): Wikimedia Commons,
+      iNaturalist, Freesound y agencias de EE. UU. (National Park Service, USGS y NOAA). Se recortaron a unos 8 segundos
+      y se igualó su volumen. Algunas son de una especie muy cercana cuando no había grabación libre del animal exacto.
+      Los animales que casi no hacen ruido tienen un dato curioso en lugar de sonido.</p>
+    <p>Esta página no tiene enlaces, videos, publicidad ni seguimiento.</p>
+    <p><b>Créditos de los sonidos</b></p>
+    <ol><li><b>1. Jaguar</b>: «jaguar_growl_roar.wav», Vaporpup. CC0, Freesound. <span class="src">https://freesound.org/people/Vaporpup/sounds/571287/</span></li>
+<li><b>2. Tucán</b>: «Ramphastos sulfuratus», keesgroenendijk. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/337111146</span></li>
+<li><b>4. Rana fresa</b>: «Oophaga pumilio», Ken-ichi Ueda. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/151997314</span></li>
+<li><b>5. Quetzal</b>: «Pharomachrus mocinno», Kalvin Chan. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/201760916</span></li>
+<li><b>6. Guacamaya</b>: «Ara macao cyanopterus», Daniel Acosta. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/211209319</span></li>
+<li><b>7. Mono araña</b>: «Ateles geoffroyi azuerensis», keesgroenendijk. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/144493970</span></li>
+<li><b>9. Tigre</b>: «439280 schots angry-tiger.wav», schots. CC0, Wikimedia Commons. <span class="src">https://commons.wikimedia.org/wiki/File:439280_schots_angry-tiger.wav</span></li>
+<li><b>11. Boa</b>: «Boa Constrictor.wav», Kjell Persson. CC BY 3.0, Freesound. <span class="src">https://freesound.org/people/Kjell%20Persson/sounds/33458/</span></li>
+<li><b>14. Coatí</b>: «Nasua narica», Donají Graham. CC0, iNaturalist. <span class="src">http://conabio.inaturalist.org/observations/6434549</span></li>
+<li><b>22. Elefante</b>: «Loxodonta africana», Tuoichen. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/48825579</span></li>
+<li><b>24. León</b>: «Lions screaming during the night», felix.blume. CC0, Freesound. <span class="src">https://freesound.org/people/felix.blume/sounds/405211/</span></li>
+<li><b>25. Cebra</b>: «Equus quagga», Christine Stone. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/293825875</span></li>
+<li><b>26. Suricata</b>: «suricate qui cherche a manger mono; meerkats digging for food.wav», jimipoo32. CC BY 3.0, Freesound. <span class="src">https://freesound.org/people/jimipoo32/sounds/489874/</span></li>
+<li><b>27. Rinoceronte</b> (especie cercana): «white Rhino   fighting», geoffvt. CC0, Freesound. <span class="src">https://freesound.org/people/geoffvt/sounds/792852/</span></li>
+<li><b>28. Guepardo</b>: «Acoustic-Structure-and-Contextual-Use-of-Calls-by-Captive-Male-and-Female-Cheetahs-(Acinonyx-pone.0158546.s001.oga», Smirnova D, Volodin I, Demina T, Volodina E. CC BY 4.0, Wikimedia Commons. <span class="src">https://commons.wikimedia.org/wiki/File:Acoustic-Structure-and-Contextual-Use-of-Calls-by-Captive-Male-and-Female-Cheetahs-(Acinonyx-pone.0158546.s001.oga</span></li>
+<li><b>29. Hiena</b>: «Crocuta crocuta», i_c_riddell. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/295627373</span></li>
+<li><b>31. Ñu</b>: «Connochaetes taurinus mearnsi», Jono. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/391056098</span></li>
+<li><b>32. Facóquero</b>: «Swine - Warthog; Grunting and Squealing», TheKingOfGeeks360. CC0, Freesound. <span class="src">https://freesound.org/people/TheKingOfGeeks360/sounds/850012/</span></li>
+<li><b>33. Babuino</b> (especie cercana): «Papio ursinus», Matthew Fainman. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/67144266</span></li>
+<li><b>34. Perro salvaje</b> (especie cercana): «Canis lycaon», Buddy. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/35458948</span></li>
+<li><b>37. Gacela</b> (especie cercana): «Arctocephalus gazella», steve b. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/107785962</span></li>
+<li><b>46. Ballena jorobada</b>: «Megaptera novaeangliae», Tuoichen. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/40897361</span></li>
+<li><b>48. Delfín</b>: «Tutr-multisound-NOAA-PAGroup-03-bottlenose-dolphin-clip.mp3», NOAA Fisheries. Dominio público, NOAA. <span class="src">https://www.fisheries.noaa.gov/national/science-data/sounds-ocean-mammals</span></li>
+<li><b>57. Orca</b>: «Orcinus orca», steve b. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/163442616</span></li>
+<li><b>58. Nutria marina</b>: «Enhydra lutris kenyoni», Tuoichen. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/127433569</span></li>
+<li><b>64. Oso polar</b> (especie cercana): «BEARGrowl_04.wav», tbsounddesigns. CC BY 4.0, Freesound. <span class="src">https://freesound.org/people/tbsounddesigns/sounds/416858/</span></li>
+<li><b>65. Zorro ártico</b> (especie cercana): «Dogs respond to barking fox», SoundsLikeYukon. CC0, Freesound. <span class="src">https://freesound.org/people/SoundsLikeYukon/sounds/865258/</span></li>
+<li><b>66. Morsa</b>: «PointLayWalrus2013_1.mp3», U.S. Geological Survey. Dominio público, USGS. <span class="src">https://www.usgs.gov/media/audio/walruses-hauled-out-northwest-coast-alaska</span></li>
+<li><b>67. Cría de foca</b> (especie cercana): «hungry Grey Seal-Pup», schaarsen. CC0, Freesound. <span class="src">https://freesound.org/people/schaarsen/sounds/662556/</span></li>
+<li><b>69. Beluga</b>: «Dele-multisound-NOAA-Castellote-01-beluga-clip.mp3», NOAA Fisheries. Dominio público, NOAA. <span class="src">https://www.fisheries.noaa.gov/national/science-data/sounds-ocean-mammals</span></li>
+<li><b>70. Búho nival</b>: «snowy owl.mp3», soundmary. CC BY 4.0, Freesound. <span class="src">https://freesound.org/people/soundmary/sounds/194945/</span></li>
+<li><b>71. Reno</b>: «reindeer.aif», ikbenraar. CC BY 4.0, Freesound. <span class="src">https://freesound.org/people/ikbenraar/sounds/381303/</span></li>
+<li><b>73. Lobo ártico</b> (especie cercana): «nri-WolfDENA.mp3», National Park Service. Dominio público, NPS. <span class="src">https://www.nps.gov/subjects/sound/sounds-wolf.htm</span></li>
+<li><b>74. Frailecillo</b>: «Fratercula arctica», Steve Lawson. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/167903634</span></li>
+<li><b>76. Pingüino emperador</b>: «Aptenodytes forsteri», steve b. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/200575498</span></li>
+<li><b>77. Cría de pingüino</b>: «Aptenodytes forsteri», steve b. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/200575498</span></li>
+<li><b>78. Pingüino de Adelia</b>: «Pygoscelis adeliae», steve b. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/107788518</span></li>
+<li><b>79. Foca leopardo</b> (especie cercana): «Grey Seal», schaarsen. CC0, Freesound. <span class="src">https://freesound.org/people/schaarsen/sounds/495932/</span></li>
+<li><b>86. Dromedario</b> (especie cercana): «camel.flac», Erdie. CC BY 4.0, Freesound. <span class="src">https://freesound.org/people/Erdie/sounds/57181/</span></li>
+<li><b>87. Correcaminos</b>: «Geococcyx californianus», Cody Stricker. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/39924485</span></li>
+<li><b>92. Coyote</b>: «Canis latrans», Mary Krieger. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/209066062</span></li>
+<li><b>93. Serpiente de cascabel</b>: «Crotalus atrox», bobnieman. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/191301312</span></li>
+<li><b>94. Búho duende</b>: «Micrathene whitneyi», Daniel McNair. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/162419652</span></li>
+<li><b>99. Addax</b> (especie cercana): «Antelope - Blackbuck, Two Snorts», TheKingOfGeeks360. CC0, Freesound. <span class="src">https://freesound.org/people/TheKingOfGeeks360/sounds/839917/</span></li>
+<li><b>100. Camello</b> (especie cercana): «Camel Farm Bahrain (February 27th 2016) - 2 of 2», Chris Weaver. CC BY 4.0, Freesound. <span class="src">https://freesound.org/people/Chris%20Weaver/sounds/338281/</span></li>
+<li><b>106. Zorro</b>: «Vulpes vulpes», Ghostomelon. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/263952120</span></li>
+<li><b>107. Búho cornudo</b>: «Bubo virginianus», Sean Vanderluit. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/343588254</span></li>
+<li><b>108. Ardilla</b>: «Sciurus carolinensis», Mike Kerry. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/405788650</span></li>
+<li><b>110. Venado</b>: «Odocoileus virginianus», Joseph Aubert. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/187746289</span></li>
+<li><b>111. Oso negro</b> (especie cercana): «nri-BearwithCubsDENA.mp3», National Park Service. Dominio público, NPS. <span class="src">https://www.nps.gov/subjects/sound/sounds-bearcubs.htm</span></li>
+<li><b>112. Mapache</b>: «Procyon lotor», Thomas Koffel. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/43169951</span></li>
+<li><b>113. Tlacuache</b>: «Didelphis virginiana», ncb1221. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/112927147</span></li>
+<li><b>114. Pájaro carpintero</b>: «Melanerpes formicivorus», Ken-ichi Ueda. CC0, iNaturalist. <span class="src">http://www.inaturalist.org/observations/466157</span></li>
+<li><b>115. Zorrillo</b>: «Mephitis mephitis», kristinpiston. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/304384700</span></li>
+<li><b>116. Lince</b>: «Lynx rufus», lucky. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/249174262</span></li>
+<li><b>117. Castor</b>: «Castor canadensis», Leah Fulton. CC0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/72399972</span></li>
+<li><b>118. Erizo</b>: «Erinaceus europaeus», Justin Cormack. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/264709374</span></li>
+<li><b>119. Tejón</b> (especie cercana): «badger eating peanuts», TEDAgame. CC0, Freesound. <span class="src">https://freesound.org/people/TEDAgame/sounds/527390/</span></li>
+<li><b>127. Panda rojo</b>: «Red panda twittering.ogg», No machine-readable author provided. Mizunoryu assumed (based on copyright claims).. Dominio público, Wikimedia Commons. <span class="src">https://commons.wikimedia.org/wiki/File:Red_panda_twittering.ogg</span></li>
+<li><b>128. Leopardo de las nieves</b> (especie cercana): «Panthera leo», abotto. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/334660060</span></li>
+<li><b>129. Cóndor</b>: «Andean Condor call (Vultur gryphus).ogg», Fernando Castro. CC BY 4.0, Wikimedia Commons. <span class="src">https://commons.wikimedia.org/wiki/File:Andean_Condor_call_(Vultur_gryphus).ogg</span></li>
+<li><b>130. Borrego cimarrón</b> (especie cercana): «Sheep in a field on the top of a mountain in Bask Country», felix.blume. CC0, Freesound. <span class="src">https://freesound.org/people/felix.blume/sounds/138424/</span></li>
+<li><b>131. Águila real</b>: «Aquila chrysaetos», LJ Moore-McClelland. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/132349138</span></li>
+<li><b>132. Puma</b>: «Puma concolor», Martin Mortensen. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/238981410</span></li>
+<li><b>133. Teporingo</b> (especie cercana): «Ochotona princeps schisticeps», Ken-ichi Ueda. CC0, iNaturalist. <span class="src">http://www.inaturalist.org/observations/339851</span></li>
+<li><b>134. Oso de anteojos</b> (especie cercana): «nri-BearwithCubsDENA.mp3», National Park Service. Dominio público, NPS. <span class="src">https://www.nps.gov/subjects/sound/sounds-bearcubs.htm</span></li>
+<li><b>136. Chinchilla</b>: «Chinchilla.m4a», isaaku. CC0, Freesound. <span class="src">https://freesound.org/people/isaaku/sounds/676570/</span></li>
+<li><b>137. Panda</b>: «Giant panda twittering.ogg», Myself. Dominio público, Wikimedia Commons. <span class="src">https://commons.wikimedia.org/wiki/File:Giant_panda_twittering.ogg</span></li>
+<li><b>138. Yak</b>: «Yak grunts», ali.g. CC0, Freesound. <span class="src">https://freesound.org/people/ali.g/sounds/834331/</span></li>
+<li><b>139. Cabra montés</b>: «Capra ibex», Valentin Moser. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/229027580</span></li>
+<li><b>140. Marmota</b>: «Marmota monax», William Harmon. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/47450515</span></li>
+<li><b>141. Macaco</b> (especie cercana): «Bonnet Macaque Alarm Call @ GoaMarch 9 2013», Calcuttan. CC BY 4.0, Freesound. <span class="src">https://freesound.org/people/Calcuttan/sounds/187587/</span></li>
+<li><b>142. Gorila</b> (especie cercana): «CaveGorilla.wav», zatar. CC0, Freesound. <span class="src">https://freesound.org/people/zatar/sounds/370369/</span></li>
+<li><b>149. Flamenco</b>: «Phoenicopterus roseus», Mateusz Bronikowski. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/325698139</span></li>
+<li><b>150. Nutria</b> (especie cercana): «99323aab-cdd5-432a-bd33-08e8826b41de.mp3», National Park Service. Dominio público, NPS. <span class="src">https://www.nps.gov/subjects/sound/sounds-otter.htm</span></li>
+<li><b>151. Hipopótamo</b>: «Hippopotamus amphibius», Tuoichen. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/47189274</span></li>
+<li><b>152. Cocodrilo</b> (especie cercana): «nri-AlligatorEVER1.mp3», National Park Service. Dominio público, NPS. <span class="src">https://www.nps.gov/subjects/sound/sounds-alligator.htm</span></li>
+<li><b>154. Capibara</b>: «Hydrochoerus hydrochaeris», Stan Rullman. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/90187694</span></li>
+<li><b>155. Ornitorrinco</b>: «Voiced Platypus», Camixxx. CC0, Freesound. <span class="src">https://freesound.org/people/Camixxx/sounds/715034/</span></li>
+<li><b>156. Delfín rosado</b>: «Inia geoffrensis», Amber M. King. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/151783208</span></li>
+<li><b>157. Martín pescador</b>: «Alcedo atthis», Jeremy Barker. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/64785851</span></li>
+<li><b>158. Pelícano</b> (especie cercana): «Pelicans/Baby Pelicans/Waves», yfjesse. CC0, Freesound. <span class="src">https://freesound.org/people/yfjesse/sounds/242083/</span></li>
+<li><b>159. Pato mandarín</b>: «Aix galericulata», Victor Heng. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/277680189</span></li>
+<li><b>160. Rana toro</b>: «Lithobates catesbeianus», familiarjumpingspider. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/349128529</span></li>
+<li><b>176. Murciélago magueyero</b> (especie cercana): «nri-SpottedBatYOSE.mp3», National Park Service. Dominio público, NPS. <span class="src">https://www.nps.gov/subjects/sound/sounds-spotted-bat.htm</span></li>
+<li><b>177. Lechuza</b>: «Tyto furcata tuidara», Valentín Alfano. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/70122138</span></li>
+<li><b>178. Tarsero</b> (especie cercana): «Tarsius fuscus», Wich’yanan (Jay) Limparungpatthanakij. CC BY 4.0, iNaturalist. <span class="src">https://www.inaturalist.org/observations/323492684</span></li>
+<li><b>179. Kinkajú</b>: «Small Mammals - Kinkajou; Baby Chirping», TheKingOfGeeks360. CC0, Freesound. <span class="src">https://freesound.org/people/TheKingOfGeeks360/sounds/852086/</span></li></ol>
+  </details>
+</main>
+<script>
+(() => {
+  const DATA = [{"id": "selva", "titulo": "Selva tropical", "color": "rgb(46,158,107)", "items": [{"id": "jaguar", "num": 1, "nombre": "Jaguar", "audio": "audio/jaguar.mp3"}, {"id": "tucan", "num": 2, "nombre": "Tucán", "audio": "audio/tucan.mp3"}, {"id": "perezoso", "num": 3, "nombre": "Perezoso", "silencio": "Es muy callado. Cuando llama a otro perezoso, silba un «iiii» muy agudito."}, {"id": "ranafresa", "num": 4, "nombre": "Rana fresa", "audio": "audio/ranafresa.mp3"}, {"id": "quetzal", "num": 5, "nombre": "Quetzal", "audio": "audio/quetzal.mp3"}, {"id": "guacamaya", "num": 6, "nombre": "Guacamaya", "audio": "audio/guacamaya.mp3"}, {"id": "monoarana", "num": 7, "nombre": "Mono araña", "audio": "audio/monoarana.mp3"}, {"id": "orangutan", "num": 8, "nombre": "Orangután", "silencio": "Los machos lanzan un «llamado largo» que se oye a más de un kilómetro de selva."}, {"id": "tigre", "num": 9, "nombre": "Tigre", "audio": "audio/tigre.mp3"}, {"id": "tapir", "num": 10, "nombre": "Tapir", "silencio": "Se comunica con silbidos agudos, ¡parecidos a los de un pajarito!"}, {"id": "boa", "num": 11, "nombre": "Boa", "audio": "audio/boa.mp3"}, {"id": "morfo", "num": 12, "nombre": "Mariposa morfo", "silencio": "Las mariposas casi no hacen ruido. Se comunican con colores y olores."}, {"id": "iguana", "num": 13, "nombre": "Iguana", "silencio": "No canta ni ruge: platica moviendo la cabeza arriba y abajo."}, {"id": "coati", "num": 14, "nombre": "Coatí", "audio": "audio/coati.mp3"}, {"id": "okapi", "num": 15, "nombre": "Okapi", "silencio": "Habla con sonidos tan graves que nuestros oídos no alcanzan a oírlos."}, {"id": "camaleon", "num": 16, "nombre": "Camaleón", "silencio": "Casi siempre está callado. Si se enoja, abre la boca y sopla: «¡fffff!»."}]}, {"id": "sabana", "titulo": "Sabana", "color": "rgb(224,164,58)", "items": [{"id": "elefante", "num": 22, "nombre": "Elefante", "audio": "audio/elefante.mp3"}, {"id": "jirafa", "num": 23, "nombre": "Jirafa", "silencio": "Casi nunca la oyes de día, pero de noche tararea un «mmmm» muy grave."}, {"id": "leon", "num": 24, "nombre": "León", "audio": "audio/leon.mp3"}, {"id": "cebra", "num": 25, "nombre": "Cebra", "audio": "audio/cebra.mp3"}, {"id": "suricata", "num": 26, "nombre": "Suricata", "audio": "audio/suricata.mp3"}, {"id": "rinoceronte", "num": 27, "nombre": "Rinoceronte", "audio": "audio/rinoceronte.mp3"}, {"id": "guepardo", "num": 28, "nombre": "Guepardo", "audio": "audio/guepardo.mp3"}, {"id": "hiena", "num": 29, "nombre": "Hiena", "audio": "audio/hiena.mp3"}, {"id": "avestruz", "num": 30, "nombre": "Avestruz", "silencio": "El macho hace un «buuum» grave inflando el cuello; de lejos suena como un león."}, {"id": "nu", "num": 31, "nombre": "Ñu", "audio": "audio/nu.mp3"}, {"id": "facoquero", "num": 32, "nombre": "Facóquero", "audio": "audio/facoquero.mp3"}, {"id": "babuino", "num": 33, "nombre": "Babuino", "audio": "audio/babuino.mp3"}, {"id": "licaon", "num": 34, "nombre": "Perro salvaje", "audio": "audio/licaon.mp3"}, {"id": "secretario", "num": 35, "nombre": "Ave secretario", "silencio": "Casi siempre está callado; a veces hace un graznido ronco, como un sapo grande."}, {"id": "pelotero", "num": 36, "nombre": "Escarabajo pelotero", "silencio": "Casi no hace ruido; solo se oye su zumbido cuando vuela a buscar comida."}, {"id": "gacela", "num": 37, "nombre": "Gacela", "audio": "audio/gacela.mp3"}]}, {"id": "oceano", "titulo": "Océano y arrecife", "color": "rgb(38,150,196)", "items": [{"id": "pulpo", "num": 43, "nombre": "Pulpo", "silencio": "No tiene voz. Como no tiene huesos, se mete por cualquier hoyito donde quepa su pico."}, {"id": "tortuga", "num": 44, "nombre": "Tortuga marina", "silencio": "Casi no hace ruido. Las hembras regresan a poner huevos a la playa donde nacieron."}, {"id": "pezpayaso", "num": 45, "nombre": "Pez payaso", "silencio": "Aunque no lo creas, hace «pop, pop» chocando los dientes para cuidar su anémona."}, {"id": "ballena", "num": 46, "nombre": "Ballena jorobada", "audio": "audio/ballena.mp3"}, {"id": "tiburonballena", "num": 47, "nombre": "Tiburón ballena", "silencio": "No hace ruido. Nada con la boca abierta y cuela el agua como un colador gigante."}, {"id": "delfin", "num": 48, "nombre": "Delfín", "audio": "audio/delfin.mp3"}, {"id": "caballito", "num": 49, "nombre": "Caballito de mar", "silencio": "Hace clics chiquitos con la cabeza cuando come y cuando busca pareja."}, {"id": "manta", "num": 50, "nombre": "Mantarraya", "silencio": "No hace sonidos, pero a veces salta fuera del agua y cae con un ¡splash! gigante."}, {"id": "estrella", "num": 51, "nombre": "Estrella de mar", "silencio": "No hace sonidos que podamos oír. Se mueve con cientos de patitas en forma de tubo."}, {"id": "medusa", "num": 52, "nombre": "Medusa", "silencio": "No hace ruido: flota y se impulsa abriendo y cerrando su campana."}, {"id": "pezglobo", "num": 53, "nombre": "Pez globo", "silencio": "No hace ruido. Sus dientes forman un pico tan fuerte que rompe conchas."}, {"id": "vaquita", "num": 54, "nombre": "Vaquita marina", "silencio": "Hace clics muy agudos para encontrar comida; así los científicos saben dónde está."}, {"id": "ermitano", "num": 55, "nombre": "Cangrejo ermitaño", "silencio": "Cuando dos pelean por una concha, uno golpea la del otro: ¡toc, toc, toc!"}, {"id": "cirujano", "num": 56, "nombre": "Pez cirujano", "silencio": "No hace sonidos que podamos oír. De noche se mete entre los corales para dormir."}, {"id": "orca", "num": 57, "nombre": "Orca", "audio": "audio/orca.mp3"}, {"id": "nutriamarina", "num": 58, "nombre": "Nutria marina", "audio": "audio/nutriamarina.mp3"}]}, {"id": "polos", "titulo": "Polos", "color": "rgb(120,170,210)", "items": [{"id": "osopolar", "num": 64, "nombre": "Oso polar", "audio": "audio/osopolar.mp3"}, {"id": "zorroartico", "num": 65, "nombre": "Zorro ártico", "audio": "audio/zorroartico.mp3"}, {"id": "morsa", "num": 66, "nombre": "Morsa", "audio": "audio/morsa.mp3"}, {"id": "focaarpa", "num": 67, "nombre": "Cría de foca", "audio": "audio/focaarpa.mp3"}, {"id": "narval", "num": 68, "nombre": "Narval", "silencio": "Bajo el agua hace clics, silbidos y golpecitos para hablar con su grupo."}, {"id": "beluga", "num": 69, "nombre": "Beluga", "audio": "audio/beluga.mp3"}, {"id": "buhonival", "num": 70, "nombre": "Búho nival", "audio": "audio/buhonival.mp3"}, {"id": "reno", "num": 71, "nombre": "Reno", "audio": "audio/reno.mp3"}, {"id": "liebreartica", "num": 72, "nombre": "Liebre ártica", "silencio": "Casi nunca hace ruido. Sus crías nacen con pelo y con los ojos abiertos."}, {"id": "loboartico", "num": 73, "nombre": "Lobo ártico", "audio": "audio/loboartico.mp3"}, {"id": "frailecillo", "num": 74, "nombre": "Frailecillo", "audio": "audio/frailecillo.mp3"}, {"id": "bueyalmizclero", "num": 75, "nombre": "Buey almizclero", "silencio": "Los machos chocan sus cabezas con un ¡pum! tan fuerte que se oye desde muy lejos."}, {"id": "pinguino", "num": 76, "nombre": "Pingüino emperador", "audio": "audio/pinguino.mp3"}, {"id": "pinguinoemp_cria", "num": 77, "nombre": "Cría de pingüino", "audio": "audio/pinguinoemp_cria.mp3"}, {"id": "adelia", "num": 78, "nombre": "Pingüino de Adelia", "audio": "audio/adelia.mp3"}, {"id": "leopardomarino", "num": 79, "nombre": "Foca leopardo", "audio": "audio/leopardomarino.mp3"}]}, {"id": "desierto", "titulo": "Desierto", "color": "rgb(205,112,72)", "items": [{"id": "fenec", "num": 85, "nombre": "Fénec", "silencio": "Es muy platicador: ladra, gruñe y chilla para hablar con su familia."}, {"id": "dromedario", "num": 86, "nombre": "Dromedario", "audio": "audio/dromedario.mp3"}, {"id": "correcaminos", "num": 87, "nombre": "Correcaminos", "audio": "audio/correcaminos.mp3"}, {"id": "gila", "num": 88, "nombre": "Monstruo de Gila", "silencio": "Casi no hace ruido. Si lo molestan, abre la boca y sopla un silbido fuerte."}, {"id": "escorpion", "num": 89, "nombre": "Escorpión", "silencio": "No hace ruido. Siente los pasos de los bichos con pelitos finísimos en sus patas."}, {"id": "tortugadesierto", "num": 90, "nombre": "Tortuga del desierto", "silencio": "Casi no hace ruido. Guarda agua en su cuerpo y puede pasar un año sin beber."}, {"id": "cornudo", "num": 91, "nombre": "Lagarto cornudo", "silencio": "Casi no hace ruido. Si lo asustas, se infla y bufa para parecer más grande."}, {"id": "coyote", "num": 92, "nombre": "Coyote", "audio": "audio/coyote.mp3"}, {"id": "cascabel", "num": 93, "nombre": "Serpiente de cascabel", "audio": "audio/cascabel.mp3"}, {"id": "buhoduende", "num": 94, "nombre": "Búho duende", "audio": "audio/buhoduende.mp3"}, {"id": "liebrecolanegra", "num": 95, "nombre": "Liebre", "silencio": "Es muy callada. Para escapar corre en zigzag, con saltos de más de 3 metros."}, {"id": "tarantula", "num": 96, "nombre": "Tarántula", "silencio": "Su nombre científico, Aphonopelma, quiere decir «sin voz»: no hace ruido."}, {"id": "jerbo", "num": 97, "nombre": "Jerbo", "silencio": "Es tan calladito y nocturno que lo filmaron por primera vez apenas en 2007."}, {"id": "diablo", "num": 98, "nombre": "Diablo espinoso", "silencio": "No hace ruido. Tiene una «cabeza falsa» en la nuca para engañar a quien lo quiera atacar."}, {"id": "addax", "num": 99, "nombre": "Addax", "audio": "audio/addax.mp3"}, {"id": "bactriano", "num": 100, "nombre": "Camello", "audio": "audio/bactriano.mp3"}]}, {"id": "bosque", "titulo": "Bosque templado", "color": "rgb(104,140,66)", "items": [{"id": "zorro", "num": 106, "nombre": "Zorro", "audio": "audio/zorro.mp3"}, {"id": "buho", "num": 107, "nombre": "Búho cornudo", "audio": "audio/buho.mp3"}, {"id": "ardilla", "num": 108, "nombre": "Ardilla", "audio": "audio/ardilla.mp3"}, {"id": "monarca", "num": 109, "nombre": "Mariposa monarca", "silencio": "Casi no hace ruido. Sus colores avisan a los pájaros que sabe muy mal."}, {"id": "venado", "num": 110, "nombre": "Venado", "audio": "audio/venado.mp3"}, {"id": "osonegro", "num": 111, "nombre": "Oso negro", "audio": "audio/osonegro.mp3"}, {"id": "mapache", "num": 112, "nombre": "Mapache", "audio": "audio/mapache.mp3"}, {"id": "tlacuache", "num": 113, "nombre": "Tlacuache", "audio": "audio/tlacuache.mp3"}, {"id": "carpintero", "num": 114, "nombre": "Pájaro carpintero", "audio": "audio/carpintero.mp3"}, {"id": "zorrillo", "num": 115, "nombre": "Zorrillo", "audio": "audio/zorrillo.mp3"}, {"id": "lince", "num": 116, "nombre": "Lince", "audio": "audio/lince.mp3"}, {"id": "castor", "num": 117, "nombre": "Castor", "audio": "audio/castor.mp3"}, {"id": "erizo", "num": 118, "nombre": "Erizo", "audio": "audio/erizo.mp3"}, {"id": "tejon", "num": 119, "nombre": "Tejón", "audio": "audio/tejon.mp3"}, {"id": "salamandra", "num": 120, "nombre": "Salamandra", "silencio": "Es callada. Sus crías nacen en arroyos y respiran con branquias, como los peces."}, {"id": "mariquita", "num": 121, "nombre": "Mariquita", "silencio": "No hace sonidos que podamos oír. Sus manchas avisan: «¡no me comas!»."}]}, {"id": "montana", "titulo": "Montaña", "color": "rgb(138,120,176)", "items": [{"id": "pandarojo", "num": 127, "nombre": "Panda rojo", "audio": "audio/pandarojo.mp3"}, {"id": "leopardonieves", "num": 128, "nombre": "Leopardo de las nieves", "audio": "audio/leopardonieves.mp3"}, {"id": "condor", "num": 129, "nombre": "Cóndor", "audio": "audio/condor.mp3"}, {"id": "borrego", "num": 130, "nombre": "Borrego cimarrón", "audio": "audio/borrego.mp3"}, {"id": "aguilareal", "num": 131, "nombre": "Águila real", "audio": "audio/aguilareal.mp3"}, {"id": "puma", "num": 132, "nombre": "Puma", "audio": "audio/puma.mp3"}, {"id": "teporingo", "num": 133, "nombre": "Teporingo", "audio": "audio/teporingo.mp3"}, {"id": "osoanteojos", "num": 134, "nombre": "Oso de anteojos", "audio": "audio/osoanteojos.mp3"}, {"id": "llama", "num": 135, "nombre": "Llama", "silencio": "Platica con un zumbido suave, «mmm», y si ve un peligro lanza un grito de alarma."}, {"id": "chinchilla", "num": 136, "nombre": "Chinchilla", "audio": "audio/chinchilla.mp3"}, {"id": "pandagigante", "num": 137, "nombre": "Panda", "audio": "audio/pandagigante.mp3"}, {"id": "yak", "num": 138, "nombre": "Yak", "audio": "audio/yak.mp3"}, {"id": "cabramontes", "num": 139, "nombre": "Cabra montés", "audio": "audio/cabramontes.mp3"}, {"id": "marmota", "num": 140, "nombre": "Marmota", "audio": "audio/marmota.mp3"}, {"id": "macaco", "num": 141, "nombre": "Macaco", "audio": "audio/macaco.mp3"}, {"id": "gorila", "num": 142, "nombre": "Gorila", "audio": "audio/gorila.mp3"}]}, {"id": "rios", "titulo": "Ríos y humedales", "color": "rgb(63,184,175)", "items": [{"id": "ajolote", "num": 148, "nombre": "Ajolote", "silencio": "Casi no hace ruido. Respira con esas plumitas rosas que tiene a los lados de la cabeza."}, {"id": "flamenco", "num": 149, "nombre": "Flamenco", "audio": "audio/flamenco.mp3"}, {"id": "nutria", "num": 150, "nombre": "Nutria", "audio": "audio/nutria.mp3"}, {"id": "hipopotamo", "num": 151, "nombre": "Hipopótamo", "audio": "audio/hipopotamo.mp3"}, {"id": "cocodrilo", "num": 152, "nombre": "Cocodrilo", "audio": "audio/cocodrilo.mp3"}, {"id": "manati", "num": 153, "nombre": "Manatí", "silencio": "Bajo el agua hace chillidos y silbidos; mamá y cría se llaman así para no perderse."}, {"id": "capibara", "num": 154, "nombre": "Capibara", "audio": "audio/capibara.mp3"}, {"id": "ornitorrinco", "num": 155, "nombre": "Ornitorrinco", "audio": "audio/ornitorrinco.mp3"}, {"id": "delfinrosado", "num": 156, "nombre": "Delfín rosado", "audio": "audio/delfinrosado.mp3"}, {"id": "martinpescador", "num": 157, "nombre": "Martín pescador", "audio": "audio/martinpescador.mp3"}, {"id": "pelicano", "num": 158, "nombre": "Pelícano", "audio": "audio/pelicano.mp3"}, {"id": "patomandarin", "num": 159, "nombre": "Pato mandarín", "audio": "audio/patomandarin.mp3"}, {"id": "ranatoro", "num": 160, "nombre": "Rana toro", "audio": "audio/ranatoro.mp3"}, {"id": "tortugapintada", "num": 161, "nombre": "Tortuga pintada", "silencio": "No hace ruido. Le encanta tomar el sol sobre los troncos, a veces una encima de otra."}, {"id": "libelula", "num": 162, "nombre": "Libélula", "silencio": "Solo se oye el zumbido de sus cuatro alas cuando pasa volando cerca."}, {"id": "salmon", "num": 163, "nombre": "Salmón", "silencio": "No hace ruido. Encuentra el río donde nació siguiendo su olor."}]}, {"id": "especiales", "titulo": "Tesoros escondidos", "color": "rgb(58,64,140)", "items": [{"id": "luciernaga", "num": 171, "nombre": "Luciérnaga", "silencio": "No hace ruido: platica con destellos de luz, y cada especie parpadea a su propio ritmo."}, {"id": "calamarluciernaga", "num": 172, "nombre": "Calamar luciérnaga", "silencio": "No hace ruido. En primavera llegan miles a una bahía de Japón y el mar brilla de azul."}, {"id": "rape", "num": 173, "nombre": "Pez rape", "silencio": "No hace sonidos que podamos oír. Vive tan hondo que allá nunca llega la luz del sol."}, {"id": "medusacristal", "num": 174, "nombre": "Medusa de cristal", "silencio": "No hace ruido. En lugar de sonidos, brilla con luz verde."}, {"id": "pezlinterna", "num": 175, "nombre": "Pez linterna", "silencio": "No hace sonidos. Se ilumina con lucecitas en la panza para que no lo vean desde abajo."}, {"id": "murcielago", "num": 176, "nombre": "Murciélago magueyero", "audio": "audio/murcielago.mp3"}, {"id": "lechuza", "num": 177, "nombre": "Lechuza", "audio": "audio/lechuza.mp3"}, {"id": "tarsero", "num": 178, "nombre": "Tarsero", "audio": "audio/tarsero.mp3"}, {"id": "kinkaju", "num": 179, "nombre": "Kinkajú", "audio": "audio/kinkaju.mp3"}, {"id": "galago", "num": 180, "nombre": "Gálago", "silencio": "Le dicen «bebé del monte» porque de noche llora como un bebé."}]}];
+  const nav = document.getElementById("nav"), list = document.getElementById("list");
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+  const icon = '<svg class="icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3v14l12-7z"/></svg><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>';
+  for (const s of DATA) {
+    nav.insertAdjacentHTML("beforeend", `<a href="#${s.id}" style="--c:${s.color}">${esc(s.titulo)}</a>`);
+    const cards = s.items.map(a => `
+      <div class="card" id="a-${a.id}">
+        <img src="img/${a.id}.webp" alt="Estampa ${a.num}: ${esc(a.nombre)}" width="299" height="389" loading="lazy">
+        <div><div class="name">${esc(a.nombre)}</div><div class="num">Estampa ${a.num}</div></div>
+        ${a.audio ? `<button type="button" class="play" data-src="${a.audio}" aria-label="Escuchar ${esc(a.nombre)}">${icon}<span class="lbl">Escuchar</span></button>`
+                  : `<p class="quiet">${esc(a.silencio || "")}</p>`}
+      </div>`).join("");
+    list.insertAdjacentHTML("beforeend", `<section id="${s.id}" style="--c:${s.color}" aria-labelledby="h-${s.id}">
+      <h2 id="h-${s.id}">${esc(s.titulo)}</h2><div class="grid">${cards}</div></section>`);
+  }
+
+  // Un solo reproductor: tocar otro animal detiene el anterior; tocar el mismo lo para.
+  const audio = new Audio();
+  audio.preload = "none";
+  let current = null;
+  const stop = () => {
+    if (!current) return;
+    current.closest(".card").classList.remove("on");
+    current.querySelector(".lbl").textContent = "Escuchar";
+    current = null;
+  };
+  audio.addEventListener("ended", stop);
+  audio.addEventListener("error", stop);
+  list.addEventListener("click", e => {
+    const b = e.target.closest(".play");
+    if (!b) return;
+    if (current === b) { audio.pause(); stop(); return; }
+    stop();
+    audio.src = b.dataset.src;
+    current = b;
+    b.closest(".card").classList.add("on");
+    b.querySelector(".lbl").textContent = "Parar";
+    audio.play().catch(stop);
+  });
+  // Si cambia de pestaña o bloquea el celular, que deje de sonar.
+  document.addEventListener("visibilitychange", () => { if (document.hidden) { audio.pause(); stop(); } });
+
+  if (location.hash) { const t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
+})();
+</script>
+</body>
+</html>
